@@ -4,10 +4,21 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/jackcoble/puregym-go"
 	"github.com/joho/godotenv"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+)
+
+// Prometheus metrics
+var (
+	capacityCount = promauto.NewGauge(prometheus.GaugeOpts{
+		Name: "capacity_count",
+		Help: "The total number of people inside the gym",
+	})
 )
 
 func main() {
@@ -28,14 +39,21 @@ func main() {
 	}
 	pureGym.SetHomeGym()
 
-	// Fetch current total amount of people in the gym
-	gymInfo, err := pureGym.GetGymAttendance()
-	if err != nil {
-		log.Fatalf(err.Error())
-		return
-	}
+	// Fetch the capacity within the gym every minute
+	go func() {
+		for {
+			gymInfo, err := pureGym.GetGymAttendance()
+			if err != nil {
+				log.Fatalf(err.Error())
+				return
+			}
 
-	log.Println("amount of people in gym:", gymInfo.TotalPeopleInGym)
+			capacityCount.Set(float64(gymInfo.TotalPeopleInGym))
+
+			// Do it again in 30 seconds
+			time.Sleep(30 * time.Second)
+		}
+	}()
 
 	// Start a HTTP server for Metrics
 	http.Handle("/metrics", promhttp.Handler())
