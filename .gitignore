@@ -1,3 +1,6 @@
 # Docker volumes
 prometheus
 grafana
+
+# Environment files
+.env
