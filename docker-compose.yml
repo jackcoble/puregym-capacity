@@ -1,5 +1,14 @@
 version: "3.8"
 services:
+  # PureGym Capacity
+  puregym_capacity:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: puregym_capacity
+    ports:
+      - 2222:2222
+
   # Grafana UI
   grafana:
     image: grafana/grafana:latest
