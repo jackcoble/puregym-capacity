@@ -1,0 +1,43 @@
+version: "3.8"
+services:
+  # Grafana UI
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - 3000:3000
+    volumes:
+      - grafana:/var/lib/grafana
+
+  # Prometheus
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - 9090:9090
+    volumes:
+      - prometheus_config:/etc/prometheus
+      - prometheus_data:/prometheus
+
+# Local volumes
+volumes:
+  grafana:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./grafana
+      o: bind
+
+  prometheus_config:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./prometheus/config
+      o: bind
+
+  prometheus_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./prometheus/data
+      o: bind
