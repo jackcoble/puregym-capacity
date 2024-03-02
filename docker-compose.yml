@@ -6,6 +6,7 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: puregym_capacity
+    env_file: .env
     ports:
       - 2222:2222
 
@@ -15,8 +16,6 @@ services:
     container_name: grafana
     ports:
       - 3000:3000
-    volumes:
-      - grafana:/var/lib/grafana
 
   # Prometheus
   prometheus:
@@ -30,13 +29,6 @@ services:
 
 # Local volumes
 volumes:
-  grafana:
-    driver: local
-    driver_opts:
-      type: none
-      device: ./grafana
-      o: bind
-
   prometheus_config:
     driver: local
     driver_opts:
